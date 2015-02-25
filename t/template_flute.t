@@ -11,17 +11,17 @@ use File::Basename 'dirname';
 eval { require Template::Flute; Template::Flute->import(); 1 }
   or plan skip_all => 'Template::Flute probably missing.';
 
-use_ok('Dancer2::Template::TemplateToolkit');
+use_ok('Dancer2::Template::TemplateFlute');
 
 my $views =
   File::Spec->rel2abs( File::Spec->catfile( dirname(__FILE__), 'views' ) );
 
-my $tt = Dancer2::Template::TemplateToolkit->new(
+my $tt = Dancer2::Template::TemplateFlute->new(
     views  => $views,
     layout => 'main.tt',
 );
 
-isa_ok $tt, 'Dancer2::Template::TemplateToolkit';
+isa_ok $tt, 'Dancer2::Template::TemplateFlute';
 ok $tt->does('Dancer2::Core::Role::Template');
 
 $tt->add_hook(

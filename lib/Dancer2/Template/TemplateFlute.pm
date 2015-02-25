@@ -1,141 +1,89 @@
+# ABSTRACT: Template flute engine for Dancer2
+
 package Dancer2::Template::TemplateFlute;
 
-use 5.006;
-use strict;
-use warnings FATAL => 'all';
+use Moo;
+use Carp qw/croak/;
+use Dancer2::Core::Types;
+use Template::Flute;
 
-=head1 NAME
+with 'Dancer2::Core::Role::Template';
 
-Dancer2::Template::TemplateFlute - The great new Dancer2::Template::TemplateFlute!
+has '+engine' => ( isa => InstanceOf ['Template::Flute'], );
 
-=head1 VERSION
+sub _build_engine {
+    my $self      = shift;
+    my $charset   = $self->charset;
+    my %tt_config = (
+        ANYCASE  => 1,
+        ABSOLUTE => 1,
+        length($charset) ? ( ENCODING => $charset ) : (),
+        %{ $self->config },
+    );
 
-Version 0.01
+    my $start_tag = $self->config->{'start_tag'};
+    my $stop_tag = $self->config->{'stop_tag'} || $self->config->{end_tag};
+    $tt_config{'START_TAG'} = $start_tag
+        if defined $start_tag && $start_tag ne '[%';
+    $tt_config{'END_TAG'} = $stop_tag
+        if defined $stop_tag && $stop_tag ne '%]';
 
-=cut
+    $tt_config{'INCLUDE_PATH'} ||= $self->views;
 
-our $VERSION = '0.01';
+    my $conf = { template_file => $self->views . '/index.tt' };
+    return Template::Flute->new($conf);
+}
 
+sub render {
+    my ( $self, $template, $tokens ) = @_;
+
+    ( ref $template || -f $template )
+        or croak "$template is not a regular file or reference";
+
+    my $content = '';
+    my $charset = $self->charset;
+    my @options
+        = length($charset) ? ( binmode => ":encoding($charset)" ) : ();
+
+    #  $template, $tokens, \$content, @options
+    my $conf = {
+        template_file => $template,
+        specification =>
+            q{<specification name="helloworld"><value name="hello"/></specification>}
+    };
+    my $tf      = Template::Flute->new(%$conf);
+    $content = $tf->process()
+        or croak $tf->error;
+    return $content;
+}
+
+1;
+
+__END__
 
 =head1 SYNOPSIS
 
-Quick summary of what the module does.
+To use this engine, you may configure L<Dancer2> via C<config.yaml>:
 
-Perhaps a little code snippet.
+    template:   "template_flute"
 
-    use Dancer2::Template::TemplateFlute;
+Or you may also change the rendering engine on a per-route basis by
+setting it manually with C<set>:
 
-    my $foo = Dancer2::Template::TemplateFlute->new();
-    ...
+    # code code code
+    set template => 'template_flute';
 
-=head1 EXPORT
+=head1 DESCRIPTION
 
-A list of functions that can be exported.  You can delete this section
-if you don't export anything, such as for a purely object-oriented module.
+This template engine allows you to use L<Template::Flute> in L<Dancer2>.
 
-=head1 SUBROUTINES/METHODS
+=method render($template, \%tokens)
 
-=head2 function1
+Renders the template.  The first arg is a filename for the template file
+or a reference to a string that contains the template.  The second arg
+is a hashref for the tokens that you wish to pass to
+L<Template::Toolkit> for rendering.
 
-=cut
+=head1 SEE ALSO
 
-sub function1 {
-}
-
-=head2 function2
-
-=cut
-
-sub function2 {
-}
-
-=head1 AUTHOR
-
-Mr. Maloof, C<< <bill at bottlenose-wine.com> >>
-
-=head1 BUGS
-
-Please report any bugs or feature requests to C<bug-dancer2-template-templateflute at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dancer2-Template-TemplateFlute>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
-
-
-
-
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
-    perldoc Dancer2::Template::TemplateFlute
-
-
-You can also look for information at:
-
-=over 4
-
-=item * RT: CPAN's request tracker (report bugs here)
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Dancer2-Template-TemplateFlute>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Dancer2-Template-TemplateFlute>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Dancer2-Template-TemplateFlute>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Dancer2-Template-TemplateFlute/>
-
-=back
-
-
-=head1 ACKNOWLEDGEMENTS
-
-
-=head1 LICENSE AND COPYRIGHT
-
-Copyright 2015 Mr. Maloof.
-
-This program is free software; you can redistribute it and/or modify it
-under the terms of the the Artistic License (2.0). You may obtain a
-copy of the full license at:
-
-L<http://www.perlfoundation.org/artistic_license_2_0>
-
-Any use, modification, and distribution of the Standard or Modified
-Versions is governed by this Artistic License. By using, modifying or
-distributing the Package, you accept this license. Do not use, modify,
-or distribute the Package, if you do not accept this license.
-
-If your Modified Version has been derived from a Modified Version made
-by someone other than you, you are nevertheless required to ensure that
-your Modified Version complies with the requirements of this license.
-
-This license does not grant you the right to use any trademark, service
-mark, tradename, or logo of the Copyright Holder.
-
-This license includes the non-exclusive, worldwide, free-of-charge
-patent license to make, have made, use, offer to sell, sell, import and
-otherwise transfer the Package with respect to any patent claims
-licensable by the Copyright Holder that are necessarily infringed by the
-Package. If you institute patent litigation (including a cross-claim or
-counterclaim) against any party alleging that the Package constitutes
-direct or contributory patent infringement, then this Artistic License
-to you shall terminate on the date that such litigation is filed.
-
-Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
-AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
-THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
-YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
-CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
-CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
-EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-
-=cut
-
-1; # End of Dancer2::Template::TemplateFlute
+L<Dancer2>, L<Dancer2::Core::Role::Template>, L<Template::Flute>.
