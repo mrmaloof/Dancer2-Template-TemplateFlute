@@ -16,15 +16,15 @@ use_ok('Dancer2::Template::TemplateFlute');
 my $views =
   File::Spec->rel2abs( File::Spec->catfile( dirname(__FILE__), 'views' ) );
 
-my $tt = Dancer2::Template::TemplateFlute->new(
+my $flute = Dancer2::Template::TemplateFlute->new(
     views  => $views,
-    layout => 'main.tt',
+    layout => 'main',
 );
 
-isa_ok $tt, 'Dancer2::Template::TemplateFlute';
-ok $tt->does('Dancer2::Core::Role::Template');
+isa_ok $flute, 'Dancer2::Template::TemplateFlute';
+ok $flute->does('Dancer2::Core::Role::Template');
 
-$tt->add_hook(
+$flute->add_hook(
     Dancer2::Core::Hook->new(
         name => 'engine.template.before_render',
         code => sub {
@@ -34,7 +34,7 @@ $tt->add_hook(
     )
 );
 
-$tt->add_hook(
+$flute->add_hook(
     Dancer2::Core::Hook->new(
         name => 'engine.template.before_layout_render',
         code => sub {
@@ -47,7 +47,7 @@ $tt->add_hook(
     )
 );
 
-$tt->add_hook(
+$flute->add_hook(
     Dancer2::Core::Hook->new(
         name => 'engine.template.after_layout_render',
         code => sub {
@@ -57,7 +57,7 @@ $tt->add_hook(
     )
 );
 
-$tt->add_hook(
+$flute->add_hook(
     Dancer2::Core::Hook->new(
         name => 'engine.template.after_render',
         code => sub {
@@ -72,7 +72,7 @@ $tt->add_hook(
     use Dancer2;
 
     # set template engine for first app
-    Dancer2->runner->apps->[0]->set_template_engine($tt);
+    Dancer2->runner->apps->[0]->set_template_engine($flute);
 
     get '/' => sub { template index => { var => 42 } };
 }
