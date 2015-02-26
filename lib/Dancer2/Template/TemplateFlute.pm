@@ -43,19 +43,21 @@ sub render {
         or croak "$template is not a regular file or reference";
 
     my $content = '';
-    my $charset = $self->charset;
-    my @options
-        = length($charset) ? ( binmode => ":encoding($charset)" ) : ();
 
-    #  $template, $tokens, \$content, @options
-    my $conf = {
-        template_file => $template,
-        specification =>
-            q{<specification name="helloworld"><value name="hello"/></specification>}
+    my $args = {
+        template_file  => $template,
+        scopes         => 1,
+        auto_iterators => 1,
+        values         => $tokens,
+        filters        => $self->config->{filters},
     };
-    my $tf      = Template::Flute->new(%$conf);
-    $content = $tf->process()
-        or croak $tf->error;
+    $args->{specification_file}
+        = Template::Flute::Utils::derive_filename( $template, '.xml' );
+    $args->{specification} = q{<specification></specification>}
+        unless -f $args->{specification_file};
+    my $flute = Template::Flute->new(%$args);
+    $content = $flute->process()
+        or croak $flute->error;
     return $content;
 }
 
