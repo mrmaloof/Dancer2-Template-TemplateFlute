@@ -34,6 +34,8 @@ sub _build_engine {
     return Template::Flute->new($conf);
 }
 
+sub default_tmpl_ext {'html'}
+
 sub render {
     my ( $self, $template, $tokens ) = @_;
 
