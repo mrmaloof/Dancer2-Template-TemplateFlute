@@ -1,4 +1,6 @@
-<specification name="helloworld">
-<value name="hello"/>
+<specification>
+    <value name="var">42</value>
+    <value name="before_layout_render">1</value>
+    <value name="before_template_render">1</value>
 </specification>
 

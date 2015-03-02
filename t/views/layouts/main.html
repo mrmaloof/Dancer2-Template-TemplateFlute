@@ -1,3 +1,16 @@
-<div class="content">
-    Hey, Now!
-</div>
+<html>
+    <head>
+        <title>
+            Dancer2::Template::TemaplateFlute test
+        </title>
+    </head>
+    <body>
+        layout top
+        var = <div class="var">21</div>
+        before_layout_render = <div class="before_layout_render">2</div>
+        ---
+        <div id="content">Content area</div>
+        ---
+        layout bottom
+    </body>
+</html>

@@ -1,3 +1,5 @@
 <specification>
-    <value name="content">WHAT?!?</value>
+    <value name="var">42</value>
+    <value name="before_layout_render">1</value>
+    <value name="content" id="content" op="hook" />
 </specification>

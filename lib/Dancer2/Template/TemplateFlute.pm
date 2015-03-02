@@ -9,31 +9,6 @@ use Template::Flute;
 
 with 'Dancer2::Core::Role::Template';
 
-has '+engine' => ( isa => InstanceOf ['Template::Flute'], );
-
-sub _build_engine {
-    my $self      = shift;
-    my $charset   = $self->charset;
-    my %tt_config = (
-        ANYCASE  => 1,
-        ABSOLUTE => 1,
-        length($charset) ? ( ENCODING => $charset ) : (),
-        %{ $self->config },
-    );
-
-    my $start_tag = $self->config->{'start_tag'};
-    my $stop_tag = $self->config->{'stop_tag'} || $self->config->{end_tag};
-    $tt_config{'START_TAG'} = $start_tag
-        if defined $start_tag && $start_tag ne '[%';
-    $tt_config{'END_TAG'} = $stop_tag
-        if defined $stop_tag && $stop_tag ne '%]';
-
-    $tt_config{'INCLUDE_PATH'} ||= $self->views;
-
-    my $conf = { template_file => $self->views . '/index.tt' };
-    return Template::Flute->new($conf);
-}
-
 sub default_tmpl_ext {'html'}
 
 sub render {
