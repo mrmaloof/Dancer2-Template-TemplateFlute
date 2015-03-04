@@ -81,30 +81,24 @@ $flute->add_hook(
 my $app    = Bar->to_app;
 my $space  = ' ';
 my $result = <<"EOR";
-<html>
-    <head>
-        <title>
+<html><head><title>
             Dancer2::Template::TemaplateFlute test
-        </title>
-    </head>
-    <body>
+        </title></head><body>
         layout top
         var = <div class="var">42</div>
         before_layout_render = <div class="before_layout_render">1</div>
         ---
-        <div class="content" op="hook">[index]
-        var = 42
+        <div id="content">[index]
+var = <div class="var">42</div>
 
-        before_layout_render =$space
-        before_template_render = 1
-        content added in after_template_render
-        content added in before_layout_render</div>
+before_layout_render = <div class="before_layout_render"></div>
+before_template_render = <div class="before_template_render">1</div>
+content added in after_template_render
+content added in before_layout_render</div>
         ---
         layout bottom
-
-        content added in after_layout_render
-    </body>
-</html>
+    </body></html>
+content added in after_layout_render
 EOR
 
 test_psgi $app, sub {
