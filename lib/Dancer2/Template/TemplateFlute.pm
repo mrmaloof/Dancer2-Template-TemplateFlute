@@ -9,6 +9,8 @@ use Template::Flute;
 
 with 'Dancer2::Core::Role::Template';
 
+use version; our $VERSION = version->new('v0.0.1');
+
 sub default_tmpl_ext {'html'}
 
 sub render {
