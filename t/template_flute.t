@@ -1,14 +1,14 @@
 use strict;
 use warnings;
-use Test::More;
 use Dancer2::Core::Hook;
 use Plack::Test;
 use HTTP::Request::Common;
+use Dancer2::Template::TemplateFlute;
 
 use File::Spec;
 use File::Basename 'dirname';
 
-plan tests => 8;
+use Test::More tests => 5;
 
 my $views = File::Spec->rel2abs(
     File::Spec->catfile( dirname(__FILE__), 'views' ) );
