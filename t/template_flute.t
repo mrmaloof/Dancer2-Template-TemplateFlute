@@ -78,8 +78,8 @@ $flute->add_hook(
     Dancer2->runner->apps->[0]->set_template_engine($flute);
 
     get '/' => sub { template index => { var => 42 } };
-    get '/color' => sub {
-        template color => {
+    get '/select' => sub {
+        template select => {
             colors => [
                 { label => 'Red',   value => '#FF000' },
                 { label => 'Green', value => '#00FF00' },
@@ -114,9 +114,9 @@ EOR
 
 test_psgi $app, sub {
     my $cb = shift;
-    ok( $cb->( GET '/color' )->content
+    ok( $cb->( GET '/select' )->content
             =~ m{<option value="#FF000">Red</option><option value="#00FF00">Green</option><option value="#0000FF">Blue</option>},
-        q{[GET /color] Content with iterator}
+        q{[GET /select] Content with iterator}
     );
     is( $cb->( GET '/' )->content,
         $result, '[GET /] Correct content with template hooks',
