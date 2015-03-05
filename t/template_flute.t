@@ -8,6 +8,8 @@ use HTTP::Request::Common;
 use File::Spec;
 use File::Basename 'dirname';
 
+plan tests => 8;
+
 eval { require Template::Flute; Template::Flute->import(); 1 }
     or plan skip_all => 'Template::Flute probably missing.';
 
