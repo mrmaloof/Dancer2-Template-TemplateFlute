@@ -1,6 +1,5 @@
 use strict;
 use warnings;
-use Test::More;
 use Dancer2::Core::Hook;
 use Plack::Test;
 use HTTP::Request::Common;
@@ -9,8 +8,7 @@ use Dancer2::Template::TemplateFlute;
 use File::Spec;
 use File::Basename 'dirname';
 
-my $test_count = 1;
-plan tests => $test_count;
+use Test::More tests => 1;
 
 my $views = File::Spec->rel2abs(
     File::Spec->catfile( dirname(__FILE__), 'views' ) );
@@ -104,5 +102,3 @@ test_psgi $app, sub {
         $result, '[GET /] Correct content with template hooks',
     );
 };
-
-done_testing($test_count);
