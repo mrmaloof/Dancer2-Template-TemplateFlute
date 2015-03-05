@@ -1,13 +1,13 @@
-#!perl -T
-use 5.006;
 use strict;
 use warnings FATAL => 'all';
-use Test::More;
+use Test::More tests => 4;
 
-plan tests => 1;
+use constant { MODULE => 'Dancer2::Template::TemplateFlute' };
 
-BEGIN {
-    use_ok( 'Dancer2::Template::TemplateFlute' ) || print "Bail out!\n";
-}
+BEGIN { use_ok(MODULE); }
+can_ok( MODULE, 'new' );
 
-diag( "Testing Dancer2::Template::TemplateFlute $Dancer2::Template::TemplateFlute::VERSION, Perl $], $^X" );
+my $flute = MODULE->new;
+isa_ok $flute, MODULE;
+ok $flute->does('Dancer2::Core::Role::Template');
+

@@ -10,11 +10,6 @@ use File::Basename 'dirname';
 
 plan tests => 8;
 
-eval { require Template::Flute; Template::Flute->import(); 1 }
-    or plan skip_all => 'Template::Flute probably missing.';
-
-use_ok('Dancer2::Template::TemplateFlute');
-
 my $views = File::Spec->rel2abs(
     File::Spec->catfile( dirname(__FILE__), 'views' ) );
 
@@ -22,9 +17,6 @@ my $flute = Dancer2::Template::TemplateFlute->new(
     views  => $views,
     layout => 'main',
 );
-
-isa_ok $flute, 'Dancer2::Template::TemplateFlute';
-ok $flute->does('Dancer2::Core::Role::Template');
 
 $flute->add_hook(
     Dancer2::Core::Hook->new(
