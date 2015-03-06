@@ -1,0 +1,5 @@
+<specification>
+    <list name="productList" class="productList" iterator="products">
+        <param name="title" class="productTitle" />
+    </list>
+</specification>

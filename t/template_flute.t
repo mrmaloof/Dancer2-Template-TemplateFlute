@@ -36,12 +36,31 @@ my $flute = Dancer2::Template::TemplateFlute->new(
             ]
         };
     };
+    get '/products' => sub {
+        template products => {
+            products => [
+                { sku => 1001, title => q{Joseph Phelps Insignia 1997} },
+                {   sku => 1002,
+                    title =>
+                        q{Limerick Lane Russian River Valley Zinfandel 2012}
+                },
+                {   sku   => 1003,
+                    title => q{M. Chapoutier Bila Haut Occultum Lapidem 2013}
+                },
+            ]
+        };
+    };
 }
 
-my $app    = Bar->to_app;
+my $app = Bar->to_app;
 
 test_psgi $app, sub {
     my $cb = shift;
+
+    ok( $cb->( GET '/products' )->content
+            =~ /Limerick Lane Russian River Valley Zinfandel 2012/,
+        q{[GET /products] list}
+    );
     ok( $cb->( GET '/select' )->content
             =~ m{<option value="#FF000">Red</option><option value="#00FF00">Green</option><option value="#0000FF">Blue</option>},
         q{[GET /select] Content with iterator}
