@@ -8,7 +8,7 @@ use Dancer2::Template::TemplateFlute;
 use File::Spec;
 use File::Basename 'dirname';
 
-use Test::More tests => 5;
+use Test::More tests => 6;
 
 my $views = File::Spec->rel2abs(
     File::Spec->catfile( dirname(__FILE__), 'views' ) );
@@ -36,19 +36,25 @@ my $flute = Dancer2::Template::TemplateFlute->new(
             ]
         };
     };
+    my $products = [
+        { sku => 1001, title => q{Joseph Phelps Insignia 1997} },
+        {   sku   => 1002,
+            title => q{Limerick Lane Russian River Valley Zinfandel 2012}
+        },
+        {   sku   => 1003,
+            title => q{M. Chapoutier Bila Haut Occultum Lapidem 2013}
+        },
+    ];
+    get '/mini_products' => sub {
+        template
+            mini_products => {
+            products           => $products,
+            specification_file => 'products.xml'
+            },
+            { layout => undef };
+    };
     get '/products' => sub {
-        template products => {
-            products => [
-                { sku => 1001, title => q{Joseph Phelps Insignia 1997} },
-                {   sku => 1002,
-                    title =>
-                        q{Limerick Lane Russian River Valley Zinfandel 2012}
-                },
-                {   sku   => 1003,
-                    title => q{M. Chapoutier Bila Haut Occultum Lapidem 2013}
-                },
-            ]
-        };
+        template products => { products => $products };
     };
 }
 
@@ -57,6 +63,10 @@ my $app = Bar->to_app;
 test_psgi $app, sub {
     my $cb = shift;
 
+    ok( $cb->( GET '/mini_products' )->content
+            =~ /Limerick Lane Russian River Valley Zinfandel 2012/,
+        q{[GET /mini_products] list}
+    );
     ok( $cb->( GET '/products' )->content
             =~ /Limerick Lane Russian River Valley Zinfandel 2012/,
         q{[GET /products] list}

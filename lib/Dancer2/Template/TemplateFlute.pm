@@ -29,7 +29,10 @@ sub render {
         filters        => $self->config->{filters},
     };
     $args->{specification_file}
-        = Template::Flute::Utils::derive_filename( $template, '.xml' );
+        = $tokens->{settings}->{views} . '/' . $tokens->{specification_file}
+        if $tokens->{specification_file};
+    $args->{specification_file}
+        ||= Template::Flute::Utils::derive_filename( $template, '.xml' );
     $args->{specification} = q{<specification></specification>}
         unless -f $args->{specification_file};
     my $flute = Template::Flute->new(%$args);
