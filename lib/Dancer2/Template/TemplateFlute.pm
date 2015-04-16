@@ -43,8 +43,6 @@ sub render {
     
     $flute->process_template();
     
-#    print Dumper $flute->template->forms->{sob};
-    
 	# check for forms
     if (my @forms = $flute->template->forms) {
         if ($tokens->{form}) {
@@ -68,13 +66,11 @@ sub _tf_manage_forms {
         if (@forms == 1) {
             my $form = shift @forms;
             if ( $form_name eq 'main' or $form_name eq $form->name ) {
-                # print "Filling the template form with" . Dumper($tokens->{form}->values);                
                 $self->_tf_fill_forms($flute, $tokens->{form}, $form, $tokens);
             }
         } else {
             my $found = 0;
             foreach my $form (@forms) {
-                # Dancer::Logger::debug("Filling the template form with" . Dumper($tokens->{form}->values));
                 if ($form_name eq $form->name) {
                     $self->_tf_fill_forms($flute, $tokens->{form}, $form, $tokens);
                     $found++;
@@ -97,18 +93,6 @@ sub _tf_manage_forms {
 
 sub _tf_fill_forms {
     my ($self, $flute, $passed_form, $form, $tokens) = @_;
-    # arguments:
-    # $flute is the template object.
-
-    # $passed_form is the Dancer2::Plugin::Form object we got from the
-    # tokens, which is $tokens->{form} when we have just a single one.
-
-    # $form is the form object we got from the template itself, with
-    # $flute->template->forms
-
-    # $tokens is the hashref passed to the template. We need it for the
-    # iterators.
-
     my ($iter, $action);
     for my $name ($form->iterators) {
         if (ref($tokens->{$name}) eq 'ARRAY') {
