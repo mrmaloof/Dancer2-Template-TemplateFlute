@@ -17,9 +17,6 @@ sub default_tmpl_ext {'html'}
 
 sub render {
     my ( $self, $template, $tokens ) = @_;
-    use Data::Dumper;
-    #print Dumper $tokens->{form}->fields;
-
     ( ref $template || -f $template )
         or croak "$template is not a regular file or reference";
 
