@@ -3,6 +3,7 @@ use warnings;
 use Dancer2::Core::Hook;
 use Plack::Test;
 use HTTP::Request::Common;
+use HTTP::Cookies;
 use Dancer2::Template::TemplateFlute;
 
 use File::Spec;
@@ -19,12 +20,13 @@ my $flute = Dancer2::Template::TemplateFlute->new(
 );
 
 {
-
     package Bar;
     use Dancer2;
+    use Dancer2::Plugin::Form;
 
     # set template engine for first app
     Dancer2->runner->apps->[0]->set_template_engine($flute);
+    set session => 'Simple';
 
     get '/' => sub { template index => { var => 42 } };
     get '/select' => sub {
@@ -56,12 +58,35 @@ my $flute = Dancer2::Template::TemplateFlute->new(
     get '/products' => sub {
         template products => { products => $products };
     };
+    any [qw/get post/] => '/register' => sub {
+        my $form = form('registration');
+        my %values = %{$form->values};
+        # VALIDATE, filter, etc. the values
+        $form->fill(\%values);
+        template register => {form => $form };
+    };
 }
 
 my $app = Bar->to_app;
 
 test_psgi $app, sub {
     my $cb = shift;
+
+    my $jar  = HTTP::Cookies->new();
+
+    my $req = GET 'http://localhost:3000/register';
+    my $res = $cb->($req);
+    $jar->extract_cookies($res);
+
+    $req = POST 'http://localhost:3000/register', ['email' => 'evan@bottlenose-wine.com'];
+    $jar->add_cookie_header($req);
+    $cb->($req);
+
+    $req = GET 'http://localhost:3000/register';
+    $jar->add_cookie_header($req);
+    
+    my $content = $cb->($req)->content;
+    ok($content =~ /evan\@bottlenose-wine.com/, 'Form refilled.');
 
     ok( $cb->( GET '/mini_products' )->content
             =~ /Limerick Lane Russian River Valley Zinfandel 2012/,
