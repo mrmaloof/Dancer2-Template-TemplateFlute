@@ -6,6 +6,8 @@ use Moo;
 use Carp qw/croak/;
 use Dancer2::Core::Types;
 use Template::Flute;
+use Template::Flute::Utils;
+use Scalar::Util qw/blessed/;
 
 with 'Dancer2::Core::Role::Template';
 
@@ -15,6 +17,8 @@ sub default_tmpl_ext {'html'}
 
 sub render {
     my ( $self, $template, $tokens ) = @_;
+    use Data::Dumper;
+    #print Dumper $tokens->{form}->fields;
 
     ( ref $template || -f $template )
         or croak "$template is not a regular file or reference";
@@ -36,9 +40,91 @@ sub render {
     $args->{specification} = q{<specification></specification>}
         unless -f $args->{specification_file};
     my $flute = Template::Flute->new(%$args);
+    
+    $flute->process_template();
+    
+#    print Dumper $flute->template->forms->{sob};
+    
+	# check for forms
+    if (my @forms = $flute->template->forms) {
+        if ($tokens->{form}) {
+            $self->_tf_manage_forms($flute, $tokens, @forms);
+        } else {
+            croak 'Missing form parameters for forms ' . join(", ", sort map { $_->name } @forms);
+        }
+    }
+    
     $content = $flute->process()
         or croak $flute->error;
     return $content;
+}
+
+sub _tf_manage_forms {
+    my ($self, $flute, $tokens, @forms) = @_;
+
+    # simple case: only one form passed and one in the flute
+    if (ref($tokens->{form}) ne 'ARRAY') {
+        my $form_name = $tokens->{form}->name;
+        if (@forms == 1) {
+            my $form = shift @forms;
+            if ( $form_name eq 'main' or $form_name eq $form->name ) {
+                # print "Filling the template form with" . Dumper($tokens->{form}->values);                
+                $self->_tf_fill_forms($flute, $tokens->{form}, $form, $tokens);
+            }
+        } else {
+            my $found = 0;
+            foreach my $form (@forms) {
+                # Dancer::Logger::debug("Filling the template form with" . Dumper($tokens->{form}->values));
+                if ($form_name eq $form->name) {
+                    $self->_tf_fill_forms($flute, $tokens->{form}, $form, $tokens);
+                    $found++;
+                }
+            }
+            if ($found != 1) {
+                croak ("Multiple form are not being managed correctly, found $found corresponding forms, but we expected just one!")
+            }
+        }
+    } else {
+        foreach my $passed_form (@{$tokens->{form}}) {
+            foreach my $form (@forms) {
+                if ($passed_form->name eq $form->name) {
+                    $self->_tf_fill_forms($flute, $passed_form, $form, $tokens);
+                }
+            }
+        }
+    }
+}
+
+sub _tf_fill_forms {
+    my ($self, $flute, $passed_form, $form, $tokens) = @_;
+    # arguments:
+    # $flute is the template object.
+
+    # $passed_form is the Dancer2::Plugin::Form object we got from the
+    # tokens, which is $tokens->{form} when we have just a single one.
+
+    # $form is the form object we got from the template itself, with
+    # $flute->template->forms
+
+    # $tokens is the hashref passed to the template. We need it for the
+    # iterators.
+
+    my ($iter, $action);
+    for my $name ($form->iterators) {
+        if (ref($tokens->{$name}) eq 'ARRAY') {
+            $iter = Template::Flute::Iterator->new($tokens->{$name});
+            $flute->specification->set_iterator($name, $iter);
+        }
+    }
+    if ($action = $passed_form->action()) {
+        $form->set_action($action);
+    }
+    $passed_form->fields([map {$_->{name}} @{$form->fields()}]);
+    $form->fill($passed_form->fill());
+
+    if ($self->settings->{session}) {
+        $passed_form->to_session;
+    }
 }
 
 1;
