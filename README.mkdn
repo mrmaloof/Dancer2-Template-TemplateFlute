@@ -1,0 +1,32 @@
+# SYNOPSIS
+
+To use this engine, you may configure [Dancer2](https://metacpan.org/pod/Dancer2) via `config.yaml`:
+
+    template:   "template_flute"
+
+Or you may also change the rendering engine on a per-route basis by
+setting it manually with `set`:
+
+    # code code code
+    set template => 'template_flute';
+
+# DESCRIPTION
+
+This template engine allows you to use [Template::Flute](https://metacpan.org/pod/Template::Flute) in [Dancer2](https://metacpan.org/pod/Dancer2).
+
+# INTERFACE
+
+- render($template, \\%tokens)
+
+    Renders the template.  The first arg is a filename for the template file
+    or a reference to a string that contains the template.  The second arg
+    is a hashref for the tokens that you wish to pass to
+    [Template::Toolkit](https://metacpan.org/pod/Template::Toolkit) for rendering.
+
+- default\_tmpl\_ext
+
+    The extension for the template files. `html`.
+
+# SEE ALSO
+
+[Dancer2](https://metacpan.org/pod/Dancer2), [Dancer2::Core::Role::Template](https://metacpan.org/pod/Dancer2::Core::Role::Template), [Template::Flute](https://metacpan.org/pod/Template::Flute).
