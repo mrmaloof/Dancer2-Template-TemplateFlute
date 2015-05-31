@@ -2,14 +2,13 @@
 
 package Dancer2::Template::TemplateFlute;
 
-use Moo;
 use Carp qw/croak/;
 use Dancer2::Core::Types;
 use Template::Flute;
 
+use Moo;
 with 'Dancer2::Core::Role::Template';
-
-use version; our $VERSION = version->new('v0.0.1');
+use namespace::clean;
 
 sub default_tmpl_ext {'html'}
 
@@ -61,12 +60,22 @@ setting it manually with C<set>:
 
 This template engine allows you to use L<Template::Flute> in L<Dancer2>.
 
-=method render($template, \%tokens)
+=head1 METHODS
+
+=over
+
+=item render($template, \%tokens)
 
 Renders the template.  The first arg is a filename for the template file
 or a reference to a string that contains the template.  The second arg
 is a hashref for the tokens that you wish to pass to
 L<Template::Toolkit> for rendering.
+
+=item default_tmpl_ext
+
+The extension for the template files. C<html>.
+
+=back
 
 =head1 SEE ALSO
 
