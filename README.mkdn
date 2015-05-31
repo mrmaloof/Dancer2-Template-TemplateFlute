@@ -14,7 +14,7 @@ setting it manually with `set`:
 
 This template engine allows you to use [Template::Flute](https://metacpan.org/pod/Template::Flute) in [Dancer2](https://metacpan.org/pod/Dancer2).
 
-# INTERFACE
+# METHODS
 
 - render($template, \\%tokens)
 
