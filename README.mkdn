@@ -1,3 +1,11 @@
+# NAME
+
+Dancer2::Template::TemplateFlute - Template flute engine for Dancer2
+
+# VERSION
+
+version 0.001
+
 # SYNOPSIS
 
 To use this engine, you may configure [Dancer2](https://metacpan.org/pod/Dancer2) via `config.yaml`:
@@ -30,3 +38,14 @@ This template engine allows you to use [Template::Flute](https://metacpan.org/po
 # SEE ALSO
 
 [Dancer2](https://metacpan.org/pod/Dancer2), [Dancer2::Core::Role::Template](https://metacpan.org/pod/Dancer2::Core::Role::Template), [Template::Flute](https://metacpan.org/pod/Template::Flute).
+
+# AUTHOR
+
+William Carr <bill@bottlenose-wine.com>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by William Carr.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
