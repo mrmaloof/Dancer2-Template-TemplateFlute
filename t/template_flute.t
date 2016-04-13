@@ -20,6 +20,7 @@ my $flute = Dancer2::Template::TemplateFlute->new(
 );
 
 {
+
     package Bar;
     use Dancer2;
     use Dancer2::Plugin::Form;
@@ -84,7 +85,7 @@ test_psgi $app, sub {
 
     $req = GET 'http://localhost:3000/register';
     $jar->add_cookie_header($req);
-    
+
     my $content = $cb->($req)->content;
     ok($content =~ /evan\@bottlenose-wine.com/, 'Form refilled.');
 

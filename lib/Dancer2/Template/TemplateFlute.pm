@@ -16,6 +16,7 @@ sub default_tmpl_ext {'html'}
 
 sub render {
     my ( $self, $template, $tokens ) = @_;
+
     ( ref $template || -f $template )
         or croak "$template is not a regular file or reference";
 
@@ -36,9 +37,9 @@ sub render {
     $args->{specification} = q{<specification></specification>}
         unless -f $args->{specification_file};
     my $flute = Template::Flute->new(%$args);
-    
+
     $flute->process_template();
-    
+
 	# check for forms
     if (my @forms = $flute->template->forms) {
         if ($tokens->{form}) {
@@ -47,7 +48,7 @@ sub render {
             croak 'Missing form parameters for forms ' . join(", ", sort map { $_->name } @forms);
         }
     }
-    
+
     $content = $flute->process()
         or croak $flute->error;
     return $content;
